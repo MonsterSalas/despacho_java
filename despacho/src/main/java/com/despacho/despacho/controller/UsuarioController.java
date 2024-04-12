@@ -1,5 +1,6 @@
 package com.despacho.despacho.controller;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +17,14 @@ import java.util.List;
 import java.util.Optional;
 
 
+
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+    
 
     @GetMapping
     public List<Usuario> getAllUsuario(){
@@ -51,7 +54,6 @@ public class UsuarioController {
             return "Usuario o contraseña incorrectos";
         }
     }
-        
     @PutMapping("/{id}")
     public Usuario updateUsuario(@PathVariable Long id,@RequestBody Usuario usuario) {
         return usuarioService.updateUsuario(id,usuario);
