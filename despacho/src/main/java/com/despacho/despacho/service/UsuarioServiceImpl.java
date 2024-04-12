@@ -9,6 +9,7 @@ import com.despacho.despacho.repository.UsuarioRepository;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 public class UsuarioServiceImpl implements UsuarioService{
     @Autowired
@@ -43,8 +44,9 @@ public class UsuarioServiceImpl implements UsuarioService{
     }
 
     @Override
-    public Optional<Usuario> getUsuario(String usuario, String pass) {
-        return usuarioRepository.findAll();
+    public Optional<Usuario> getUsuario(String correo, String pass) {
+        
+        return usuarioRepository.findByCorreoAndPass(correo, pass);
     }
-    
+
 }

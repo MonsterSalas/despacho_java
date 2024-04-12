@@ -12,19 +12,31 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name= "name")
-    private String name;
-    @Column(name= "rol")
+
+    @Column(name = "correo")
+    private String correo;
+
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Column(name = "rol")
     private String rol;
+
     @Column(name = "direcciones")
     private String direcciones;
+
     @Column(name = "pass")
     private String pass;
+
+    //GETTERS
     public Long getId(){
         return id;
     }
     public String getNombre(){
-        return name;
+        return nombre;
+    }
+    public String getCorreo() {
+        return correo;
     }
     public String getRol(){
         return rol;
@@ -35,12 +47,13 @@ public class Usuario {
     public String getPass(){
         return pass;
     }
+    //SETTERS
     public void setId(Long id) {
         this.id = id;
     }
     
     public void setNombre(String nombre) {
-        this.name = nombre;
+        this.nombre = nombre;
     }
     
     public void setRol(String rol) {
@@ -51,6 +64,10 @@ public class Usuario {
     }
     public void setPass(String pass) {
         this.pass = pass;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
     }
 }
 
