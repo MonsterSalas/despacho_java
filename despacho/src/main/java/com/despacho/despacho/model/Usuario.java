@@ -25,9 +25,16 @@ public class Usuario {
     @Column(name = "rol")
     @NotBlank(message = "Rol no puede ser nulo")
     private String rol;
-
-    @Column(name = "direcciones")
-    private String direcciones;
+    
+    @NotBlank(message = "Direccion 1 no puede ser nulo")
+    @Column(name = "direccion1")
+    private String direccion1;
+    
+    @Column(name = "direccion2")
+    private String direccion2;
+    
+    @Column(name = "direccion3")
+    private String direccion3;
 
     @Column(name = "pass")
     @NotBlank(message = "Contrasennia no puede ser nulo")
@@ -45,9 +52,17 @@ public class Usuario {
     public String getRol(){
         return rol;
     }
-    public String getDirecciones(){
-        return direcciones;
+    public String getDireccion1(){
+        return direccion1;
     }
+    public String getDireccion2() {
+        return direccion2;
+    }
+
+    public String getDireccion3() {
+        return direccion3;
+    }
+
     public String getPass(){
         return pass;
     }
@@ -63,8 +78,14 @@ public class Usuario {
     public void setRol(String rol) {
         this.rol = rol;
     }
-    public void setDirecciones(String direcciones) {
-        this.direcciones = direcciones;
+    public void setDireccion1(String direccion1) {
+        this.direccion1 = direccion1;
+    }
+    public void setDireccion2(String direccion2) {
+        this.direccion2 = direccion2;
+    }
+    public void setDireccion3(String direccion3) {
+        this.direccion3 = direccion3;
     }
     public void setPass(String pass) {
         this.pass = pass;
