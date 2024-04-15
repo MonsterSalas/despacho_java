@@ -42,14 +42,24 @@ public class UsuarioController {
 
     @PostMapping("/crear")
     public ResponseEntity<Object> createUsuario(@Valid @RequestBody Usuario usuario, BindingResult result) {
+        String correo = usuario.getCorreo();
+        String pass = usuario.getPass();
+
+        Optional<Usuario> usuarioOptional = usuarioService.getUsuario(correo, pass);
         if (result.hasErrors()) {
             // Si hay errores de validación, construye una respuesta con los mensajes de error
             StringBuilder errorMessage = new StringBuilder("Error de validación: ");
             result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage.toString());
         }
-        Usuario createdUsuario = usuarioService.createUsuario(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUsuario);
+        if (usuarioOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Este usuario ya se encuentra creado");
+        } else {
+            
+            Usuario createdUsuario = usuarioService.createUsuario(usuario);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUsuario);
+        }
+
     }
 
     @PostMapping("/login")
