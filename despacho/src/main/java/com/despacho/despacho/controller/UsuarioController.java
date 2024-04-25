@@ -59,48 +59,92 @@ public class UsuarioController {
         }
     }
     @PostMapping("/crear")
-    public EntityModel<Usuario>  createUsuario(@RequestBody Usuario usuario) {
-        Usuario createdUsuario = usuarioService.createUsuario(usuario);
-        return EntityModel.of(createdUsuario,
-        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getUsuarioByid(createdUsuario.getId())).withSelfRel(),
-        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllUsuario()).withRel("all-usuarios"));
-
+    public ResponseEntity<?> createUsuario(@Valid @RequestBody Usuario usuario, BindingResult result) {
+        String correo = usuario.getCorreo();
+        String pass = usuario.getPass();
+        Optional<Usuario> usuarioOptional = usuarioService.getUsuario(correo, pass);
+        if (result.hasErrors()) {
+            //Errores de validación, construye una respuesta con los mensajes de error
+            StringBuilder errorMessage = new StringBuilder("Error de validación: ");
+            result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
+            ResponseMessage errorResponse = new ResponseMessage(errorMessage.toString());
+            EntityModel<ResponseMessage> entityModel = EntityModel.of(errorResponse);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(entityModel.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).createUsuario(usuario, result)).withSelfRel()));
+        }
+        if (usuarioOptional.isPresent()) {
+            ResponseMessage errorResponse = new ResponseMessage("Este usuario ya se encuentra creado con el correo: " + correo);
+            EntityModel<ResponseMessage> entityModel = EntityModel.of(errorResponse);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(entityModel.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).createUsuario(usuario, result)).withSelfRel()));
+        } else {
+            Usuario createdUsuario = usuarioService.createUsuario(usuario);
+            EntityModel<Usuario> entityModel = EntityModel.of(createdUsuario,
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getUsuarioByid(createdUsuario.getId())).withSelfRel(),
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllUsuario()).withRel("all-usuarios"));
+            return ResponseEntity.status(HttpStatus.CREATED).body(entityModel);
+        }
     }
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Usuario usuario) {
+    public ResponseEntity<EntityModel<ResponseMessage>> login(@RequestBody Usuario usuario) {
         String correo = usuario.getCorreo();
         String pass = usuario.getPass();
         // Obtener usuario por correo y contraseña
         Optional<Usuario> usuarioOptional = usuarioService.getUsuario(correo, pass);
-         if(usuario.getCorreo() == null || usuario.getPass() == null ||
-         usuario.getCorreo().isEmpty() || usuario.getPass().isEmpty())
-         {            
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Los campos no pueden ser vacios");
-         }
-         else
-         {
+        
+        if(usuario.getCorreo() == null || usuario.getPass() == null ||
+           usuario.getCorreo().isEmpty() || usuario.getPass().isEmpty())
+        {            
+            ResponseMessage errorResponse = new ResponseMessage("Los campos no pueden ser vacios");
+            EntityModel<ResponseMessage> entityModel = EntityModel.of(errorResponse);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(entityModel);
+        }
+        else
+        {
             if (usuarioOptional.isPresent()) {
-                return ResponseEntity.ok("Usuario logeado exitosamente");
+                ResponseMessage successResponse = new ResponseMessage("Usuario logeado exitosamente");
+                EntityModel<ResponseMessage> entityModel = EntityModel.of(successResponse);
+                entityModel.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllUsuario()).withRel("all-usuarios"));
+                return ResponseEntity.ok(entityModel);
             } else {
-                
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario o contraseña incorrectos");
+                ResponseMessage errorResponse = new ResponseMessage("Usuario o contraseña incorrectos");
+                EntityModel<ResponseMessage> entityModel = EntityModel.of(errorResponse);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(entityModel);
             }
-         }
+        }
     }
+    
+
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateUsuario(@PathVariable Long id, @Valid @RequestBody Usuario usuario, BindingResult result) {
         if (result.hasErrors()) {
             // Si hay errores de validación, construye una respuesta con los mensajes de error
             StringBuilder errorMessage = new StringBuilder("Error de validación: ");
             result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage.toString());
+            ResponseMessage errorResponse = new ResponseMessage(errorMessage.toString());
+            EntityModel<ResponseMessage> entityModel = EntityModel.of(errorResponse);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(entityModel.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).updateUsuario(id, usuario, result)).withSelfRel()));
         }
-
         Usuario updatedUsuario = usuarioService.updateUsuario(id, usuario);
-        return ResponseEntity.ok(updatedUsuario);
+        EntityModel<Usuario> entityModel = EntityModel.of(updatedUsuario,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getUsuarioByid(updatedUsuario.getId())).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllUsuario()).withRel("all-usuarios"));
+        return ResponseEntity.ok(entityModel);
     }
+     
     @DeleteMapping("/{id}")
     public void deleteUsuario(@PathVariable Long id) {
         usuarioService.deleteUsuario(id);
     } 
+    class ResponseMessage {
+        private String message;
+    
+        public ResponseMessage(String message) {
+            this.message = message;
+        }
+        public String getMessage() {
+            return message;
+        }
+    }
 }
