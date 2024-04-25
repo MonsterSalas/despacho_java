@@ -113,12 +113,11 @@ public class UsuarioController {
             }
         }
     }
-    
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateUsuario(@PathVariable Long id, @Valid @RequestBody Usuario usuario, BindingResult result) {
         if (result.hasErrors()) {
-            // Si hay errores de validación, construye una respuesta con los mensajes de error
+            //Errores de validación, construye una respuesta con los mensajes de error
             StringBuilder errorMessage = new StringBuilder("Error de validación: ");
             result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
             ResponseMessage errorResponse = new ResponseMessage(errorMessage.toString());

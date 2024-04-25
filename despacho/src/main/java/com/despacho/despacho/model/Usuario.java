@@ -8,8 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-
-import org.springframework.hateoas.RepresentationModel;
 @Entity
 @Table(name = "usuario")
 public class Usuario extends RepresentationModel<Usuario>{
