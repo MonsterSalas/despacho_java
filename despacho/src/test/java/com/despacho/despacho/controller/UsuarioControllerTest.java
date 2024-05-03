@@ -42,15 +42,10 @@ public class UsuarioControllerTest {
         usuario2.setDireccion1("Prueba");
         usuario2.setPass("1234");
         usuario2.setRol("admin");
-        
         usuario2.setId(21L);
-        
         List<Usuario> usuarios = Arrays.asList(usuario1, usuario2);
-        
         when (usuarioServiceMock.getAllUsuario()).thenReturn (usuarios);
-        
         // Act & Assert
-        
         mockMvc.perform(MockMvcRequestBuilders.get("/usuarios"))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.usuarioList", Matchers.hasSize(2)))
